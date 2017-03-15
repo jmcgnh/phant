@@ -1,18 +1,25 @@
 {
-  "name": "phant",
-  "version": "6.8.0",
+  "name": "phantj",
+  "version": "6.8.5",
   "main": "index.js",
-  "description": "data collection server for the internet of things",
-  "homepage": "https://github.com/sparkfun/phant",
-  "bugs": "https://github.com/sparkfun/phant/issues",
+  "description": "data collection server for the internet of things - based on sparkfun",
+  "homepage": "https://github.com/jmcgnh/phantj",
+  "bugs": "https://github.com/jmcgnh/phantj/issues",
   "author": {
     "name": "Todd Treece",
     "email": "todd@uniontownlabs.org",
     "url": "http://uniontownlabs.org"
   },
+  "contributors": {
+    "name": "Jim McGinness",
+    "email": "<jmcgnh@gmail.com>",
+    "url": "(https://github.com/jmcgnh)"
+
+  },
+
   "repository": {
     "type": "git",
-    "url": "git://github.com/sparkfun/phant"
+    "url": "git://github.com/jmcgnh/phantj"
   },
   "license": "GPL-3.0",
   "keywords": [
@@ -25,7 +32,7 @@
     "node": "^0.10.30"
   },
   "bin": {
-    "phant": ".bin/serve"
+    "phantj": ".bin/serve"
   },
   "scripts": {
     "start": ".bin/serve",

@@ -7,9 +7,12 @@ var Phant = require('../index'),
     Meta = require('phant-meta-nedb'),
     Storage = require('phant-stream-csv'),
     HttpManager = require('phant-manager-http'),
-    app = Phant()
+    app = Phant(),
+    server_style = process.env.PHANT_SERVERSTYLE || 'http',
     http_port = process.env.PHANT_PORT || 8080,
     telnet_port = process.env.PHANT_TELNET_PORT || 8081;
+
+console.log( "process.env.PHANT_SERVER_STLE = " + process.env.PHANT_SERVERSTYLE);
 
 var keys = Keychain({
   publicSalt: process.env.PHANT_PUBLIC_SALT || 'public salt',
@@ -41,8 +44,16 @@ var httpInput = Phant.HttpInput({
   keychain: keys
 });
 
+// set up style of web server, http or https
+
+var webserver = Phant.HttpServer;
+if( server_style == 'https' ) {
+    webserver = Phant.HttpsServer;
+    Phant.HttpsServer.cert = process.env.PHANT_CERTFILE;
+    Phant.HttpsServer.key = process.env.PHANT_KEYFILE;
+  } 
 // start listening for connections
-Phant.HttpServer.listen(http_port);
+webserver.listen(http_port);
 
 var httpManager = HttpManager({
   metadata: meta,
@@ -53,14 +64,14 @@ var httpManager = HttpManager({
 // register manager with phant
 app.registerManager(httpManager);
 
-// attach manager to http server
-Phant.HttpServer.use(httpManager);
+// attach manager to web server
+webserver.use(httpManager);
 
-// attach input to http server
-Phant.HttpServer.use(httpInput);
+// attach input to web server
+webserver.use(httpInput);
 
-// attach output to http server
-Phant.HttpServer.use(httpOutput);
+// attach output to web server
+webserver.use(httpOutput);
 
 // register input with phant
 app.registerInput(httpInput);
@@ -68,7 +79,7 @@ app.registerInput(httpInput);
 app.registerOutput(stream);
 app.registerOutput(httpOutput);
 
-// register manager with phant
+// register telnet manager with phant
 app.registerManager(
   Phant.TelnetManager({
     port: telnet_port,
@@ -78,5 +89,6 @@ app.registerManager(
   })
 );
 
-console.log('phant http server running on port ' + http_port);
+console.log('phant ' + server_style + ' server running on port ' + http_port);
 console.log('phant telnet server running on port ' + telnet_port);
+
