@@ -5,5 +5,7 @@ npm-debug.log
 /tmp/
 /test/tmp/
 /phant_streams/
+phant_streams/
 .DS_Store
 .vagrant
+testrun*.sh
