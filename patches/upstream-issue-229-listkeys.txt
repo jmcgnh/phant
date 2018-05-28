@@ -1,0 +1,74 @@
+The keys are just a hash function applied to the stream ID, they're not stored anywhere.
+
+Since you're operating your own private instance of the server, you should be able to make the following change. This adds a 'listkeys' command to the telnet interface which you can use to recover the keys and then follow the normal procedures to delete them. It should go without saying that this function must not be made generally available and you should back out these diffs once you've done what you needed to do.
+
+*** telnet_manager.js:orig	Mon Feb 27 05:19:55 2017
+--- telnet_manager.js	Wed Jun 21 05:11:17 2017
+***************
+*** 181,186 ****
+--- 181,187 ----
+  
+    w('\n');
+    w('list       list public streams\n');
++   w('listkeys   list public streams with ID and keys\n');
+    w('create     create a new stream\n');
+    w('delete     remove a stream\n');
+    w('help       display this dialog\n');
+***************
+*** 363,368 ****
+--- 364,405 ----
+  };
+  
+  /**
++  * listkeys
++  *
++  * displays a list of the public streams with their IDs and keys
++  */
++ client.listkeys = function() {
++ 
++   var self = this;
++ 
++   self.write('\nPublic streams:\n');
++ 
++   self.manager.metadata.list(function(err, streams) {
++ 
++     if (err) {
++ 
++       self.write('Error retrieving streams\n');
++ 
++     } else {
++ 
++       streams.forEach(function(stream) {
++         self.write(stream.title + ' - ' + stream.id + '\n');
++         self.write('PUBLIC KEY: ' + self.manager.keychain.publicKey(stream.id) + '\n');
++         self.write('PRIVATE KEY:  ' + self.manager.keychain.privateKey(stream.id) + '\n');
++         self.write('DELETE KEY:  ' + self.manager.keychain.deleteKey(stream.id) + '\n\n');
++       });
++ 
++       self.write('\n');
++ 
++       self.prompt();
++ 
++     }
++ 
++   });
++ 
++ };
++ 
++ /**
+   * command
+   *
+   * helper function that interprets client
+***************
+*** 386,391 ****
+--- 423,432 ----
+        this.list();
+        break;
+  
++     case 'listkeys':
++       this.listkeys();
++       break;
++ 
+      case '?':
+      case 'help':
+        this.help();
